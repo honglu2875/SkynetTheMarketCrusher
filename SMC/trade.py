@@ -1,6 +1,7 @@
 import random
 import warnings
-from datetime import datetime
+from datetime import datetime, date
+from .chart import trade_to_cropped_pic
 
 class TradeEnv:
     
