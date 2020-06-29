@@ -1,3 +1,5 @@
+import numpy as np
+
 class ReplayBuffer:
     
     """Replay Buffer to store transitions.

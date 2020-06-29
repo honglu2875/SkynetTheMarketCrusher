@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 def trade_to_cropped_pic(start, end, inp, pic_size=84):
     ###### Usage: trade_to_pic(inp) returns a matrix. It can be displayed as a grayscale image. 
     ######        Current version turns every candle into a straight line with only the high/low info.
