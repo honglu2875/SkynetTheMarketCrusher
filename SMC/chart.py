@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-def trade_to_cropped_pic(start, end, inp, pic_size=84):
+def trade_to_cropped_pic(start, end, inp, pic_size=84, TICK_SIZE=.25):
     ###### Usage: trade_to_pic(inp) returns a matrix. It can be displayed as a grayscale image. 
     ######        Current version turns every candle into a straight line with only the high/low info.
     ######
@@ -12,7 +12,6 @@ def trade_to_cropped_pic(start, end, inp, pic_size=84):
     ######        the most recent close price is always printed at [pic_size - 1, int(pic_size / 2)]
 
     pic = np.zeros((pic_size, pic_size))
-    #pic = np.empty((pic_size, int(pic_size * BAR_SIZE * 2 / TICK_SIZE) - 1), dtype=np.uint8)
 
     if not isinstance(inp, pd.core.frame.DataFrame):
       raise TypeError('input type is not supported.')
