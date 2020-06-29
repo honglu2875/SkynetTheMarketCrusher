@@ -95,7 +95,7 @@ class TradeEnv:
         count += 1
 
       self.frame = trade_to_cropped_pic(self.current_range[0], self.current_range[0], self.data, pic_size=self.frame_length)
-      return self.frame, self.data.loc[self.current_range[0], FEATURE_LIST].to_list() + [self.current_position, self.PL]
+      return self.frame, self.data.loc[self.current_range[0], self.FEATURE_LIST].to_list() + [self.current_position, self.PL]
 
         
         
