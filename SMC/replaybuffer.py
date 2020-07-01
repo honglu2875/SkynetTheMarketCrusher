@@ -1,7 +1,7 @@
 import numpy as np
 
 class ReplayBuffer:
-    
+
     """Replay Buffer to store transitions.
     This implementation was heavily inspired by Fabio M. Graetz's replay buffer
     here: https://github.com/fg91/Deep-Q-Learning/blob/master/DQN.ipynb"""
@@ -32,7 +32,7 @@ class ReplayBuffer:
     def add_experience(self, action, frame, features, reward, terminal, clip_reward=False):
         """Saves a transition to the replay buffer
         Arguments:
-            action: An integer between 0 and env.action_space.n - 1 
+            action: An integer between 0 and env.action_space.n - 1
                 determining the action the agent perfomed
             frame: A (84, 84, 1) frame of the game in grayscale
             features: A list of features
@@ -148,4 +148,3 @@ class ReplayBuffer:
         self.features = np.load(folder_name + '/features.npy')
         self.rewards = np.load(folder_name + '/rewards.npy')
         self.terminal_flags = np.load(folder_name + '/terminal_flags.npy')
-
