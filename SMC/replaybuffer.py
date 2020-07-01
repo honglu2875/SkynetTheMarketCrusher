@@ -50,7 +50,7 @@ class ReplayBuffer:
         # Write memory
         self.actions[self.current] = action
         self.frames[self.current, ...] = frame
-        self.alt_frame[self.current, ...] = alt_frame
+        self.alt_frames[self.current, ...] = alt_frame
         self.features[self.current] = features
         self.rewards[self.current] = reward
         self.terminal_flags[self.current] = terminal
