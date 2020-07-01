@@ -111,8 +111,8 @@ class ReplayBuffer:
             fr = np.transpose(np.asarray(fr), axes=(1, 2, 0))
             new_fr = np.transpose(np.asarray(new_fr), axes=(1, 2, 0))
             
-            alt_fr = self.alt_frame[idx - 1, ...]
-            new_alt_fr = self.alt_frame[idx, ...]
+            alt_fr = self.alt_frames[idx - 1, ...]
+            new_alt_fr = self.alt_frames[idx, ...]
 
             frames.append(fr) #Note that these are previous frames of the action
             features.append(np.array(self.features[idx - 1]))
