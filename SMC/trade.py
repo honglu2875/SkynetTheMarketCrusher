@@ -10,7 +10,8 @@ class TradeEnv:
     def __init__(self, input_df, dates, date_index, frame_length, stop=None, target=None,
                  TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST='', ALLOW_FLIP=True,
                  SCALE_IN=False, MAX_CONTRACT=1, # MAX_CONTRACT will only be checked when SCALE_IN=True
-                 USE_ALT_TIMEFRAME=True, alt_input_df=None, index_mapping=None): # When ALT_TIMEFRAME is turned on, we include a snapshot of an alternative timeframe in the output
+                 USE_ALT_TIMEFRAME=True, alt_input_df=None, index_mapping=None, # When ALT_TIMEFRAME is turned on, we include a snapshot of an alternative timeframe in the output
+                 COMMISSION=.1): #Commission is in ticks
 
         self.data = input_df # pandas.DataFrame
         self.dates = dates # list of datetime objects
@@ -32,6 +33,7 @@ class TradeEnv:
         self.SCALE_FACTOR = SCALE_FACTOR
         self.MAX_CONTRACT = MAX_CONTRACT
         self.ALLOW_FLIP = ALLOW_FLIP
+        self.COMMISSION = COMMISSION
 
         self.USE_ALT_TIMEFRAME = USE_ALT_TIMEFRAME
         if self.USE_ALT_TIMEFRAME and (alt_input_df is None or index_mapping is None):
@@ -111,7 +113,7 @@ class TradeEnv:
         if self.USE_ALT_TIMEFRAME:
             self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0]], self.alt_data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE * self.SCALE_FACTOR)
 
-        return self.frame, self.alt_frame, self.data.loc[self.current_range[0], self.FEATURE_LIST].to_list() + [self.current_position, self.PL]
+        return self.frame, self.alt_frame, self.data.loc[self.current_range[0], self.FEATURE_LIST].to_list() + [self.current_position, self.PL, self.realized_PL]
 
 
 
@@ -133,7 +135,8 @@ class TradeEnv:
 
         self.current_entry = self.data.loc[self.current_range[0] + self.current_step, 'last']
         self.current_position = self.current_position - 1
-
+        self.realized_PL -= self.COMMISSION
+        
         ###### Only set stop or target when 1. there is a stop/target given, and 2. this is a new entry, not a repeated scale-in
         if self.stop != None and self.current_position == -1:
             self.current_stop = self.current_entry + self.stop * self.TICK_SIZE
@@ -160,6 +163,7 @@ class TradeEnv:
 
         self.current_entry = self.data.loc[self.current_range[0] + self.current_step, 'last']
         self.current_position = self.current_position + 1
+        self.realized_PL -= self.COMMISSION
 
         ###### Only set stop or target when 1. there is a stop/target given, and 2. this is a new entry, not a repeated scale-in
         if self.stop != None and self.current_position == 1:
@@ -184,6 +188,7 @@ class TradeEnv:
                 self.realized_PL = self.realized_PL + self.current_position * self.stop * self.TICK_SIZE
             else:
                 self.realized_PL = self.realized_PL + self.current_position * (self.data.loc[self.current_range[0] + self.current_step, 'last'] - self.current_entry)
+            self.realized_PL -= self.COMMISSION
 
         self.current_position = 0
         self.current_entry = 0
@@ -253,7 +258,7 @@ class TradeEnv:
 
         ###### returns the frame, the action reward (currently using P&L difference), and a boolean recording whether the game is over (currently meaning that the agent hit the maximal drawdown).
         return (self.frame, self.alt_frame,
-                self.data.loc[self.current_range[0] + self.current_step, self.FEATURE_LIST].to_list() + [self.current_position, self.PL],
+                self.data.loc[self.current_range[0] + self.current_step, self.FEATURE_LIST].to_list() + [self.current_position, self.PL, self.realized_PL],
                 reward,
                 self.terminal)
 
@@ -268,12 +273,14 @@ class TradeWrapper:
     def __init__(self, input_df, dates, date_index, no_op_steps, frame_length=84, history_length=4, stop=None, target=None,
                  TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST='', ALLOW_FLIP=True,
                  SCALE_IN=False, MAX_CONTRACT=1,
-                 USE_ALT_TIMEFRAME=True, alt_input_df=None, index_mapping=None):
+                 USE_ALT_TIMEFRAME=True, alt_input_df=None, index_mapping=None,
+                 COMMISSION=0):
 
         self.env = TradeEnv(input_df, dates, date_index, frame_length,
                             stop=stop, target=target, TICK_SIZE=TICK_SIZE, SCALE_FACTOR=SCALE_FACTOR, MAX_DAILY_STOP=MAX_DAILY_STOP, OUTPUT_LOG=OUTPUT_LOG,
                             FEATURE_LIST=FEATURE_LIST, ALLOW_FLIP=ALLOW_FLIP, SCALE_IN=SCALE_IN, MAX_CONTRACT=MAX_CONTRACT,
-                            USE_ALT_TIMEFRAME=USE_ALT_TIMEFRAME, alt_input_df=alt_input_df, index_mapping=index_mapping)
+                            USE_ALT_TIMEFRAME=USE_ALT_TIMEFRAME, alt_input_df=alt_input_df, index_mapping=index_mapping,
+                            COMMISSION=COMMISSION)
 
         self.frame = None
         self.alt_frame = None
