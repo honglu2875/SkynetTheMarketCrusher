@@ -321,13 +321,13 @@ class TradeWrapper:
             new_frame: The raw new frame as a result of that action
             If render_mode is set to 'rgb_array' this also returns the rendered rgb_array
         """
-        new_frame, alt_frame, features, reward, terminal = self.env.step(action)
+        self.frame, self.alt_frame, features, reward, terminal = self.env.step(action)
 
-        self.state = [np.append(self.state[0][0, :, :, 1:], new_frame, axis=2).reshape(1, self.frame_length, self.frame_length, self.history_length),
+        self.state = [np.append(self.state[0][0, :, :, 1:], self.frame, axis=2).reshape(1, self.frame_length, self.frame_length, self.history_length),
                       self.alt_frame.reshape(1, self.frame_length, self.frame_length, 1),
                       np.array(features).reshape(1,-1)]
 
-        return new_frame, alt_frame, features, reward, terminal
+        return self.frame, self.alt_frame, features, reward, terminal
 
 
 
