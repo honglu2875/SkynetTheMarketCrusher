@@ -2,6 +2,8 @@ import random
 import warnings
 from datetime import datetime, date
 from .chart import trade_to_cropped_pic
+import numpy as np
+import pandas as pd
 
 class TradeEnv:
 
