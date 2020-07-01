@@ -16,6 +16,9 @@ def trade_to_cropped_pic(start, end, inp, pic_size=84, TICK_SIZE=.25):
     if not isinstance(inp, pd.core.frame.DataFrame):
         raise TypeError('input type is not supported.')
 
+    if end < 0:
+        return pic.reshape((pic_size, pic_size, 1))
+    
     input_length = end - start + 1
     last_price = inp.loc[end, 'last']
 
