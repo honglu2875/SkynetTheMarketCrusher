@@ -106,9 +106,9 @@ class TradeEnv:
             if count % 10000 == 0: warnings.warn(f'Potentially unable to find a date with more than {self.MIN_FRAME} frames.')
             count += 1
 
-        self.frame = trade_to_cropped_pic(self.current_range[0], self.current_range[0], self.data, pic_size=self.frame_length)
+        self.frame = trade_to_cropped_pic(self.current_range[0], self.current_range[0], self.data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE)
         if self.USE_ALT_TIMEFRAME:
-            self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0]], self.alt_data, pic_size=self.frame_length)
+            self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0]], self.alt_data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE)
 
         return self.frame, self.alt_frame, self.data.loc[self.current_range[0], self.FEATURE_LIST].to_list() + [self.current_position, self.PL]
 
@@ -221,9 +221,9 @@ class TradeEnv:
 
             ###### Update frame
             self.current_step = self.current_step + 1
-            self.frame = trade_to_cropped_pic(self.current_range[0], self.current_range[0] + self.current_step, self.data, pic_size=self.frame_length)
+            self.frame = trade_to_cropped_pic(self.current_range[0], self.current_range[0] + self.current_step, self.data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE)
             if self.USE_ALT_TIMEFRAME:
-                self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0] + self.current_step], self.alt_data, pic_size=self.frame_length)
+                self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0] + self.current_step], self.alt_data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE)
 
             ###### We use range bar chart and we assume the stop and target cannot be filled at the same time (target stop range is larger than the size of each bar)
             high = self.data.loc[self.current_range[0] + self.current_step, 'high']
