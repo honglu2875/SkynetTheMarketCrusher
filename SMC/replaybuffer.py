@@ -5,7 +5,7 @@ class ReplayBuffer:
     """Replay Buffer to store transitions.
     This implementation was heavily inspired by Fabio M. Graetz's replay buffer
     here: https://github.com/fg91/Deep-Q-Learning/blob/master/DQN.ipynb"""
-    def __init__(self, size=100000, input_shape=(84, 84), history_length=4, use_per=True):
+    def __init__(self, feature_num, size=100000, input_shape=(84, 84), history_length=4, use_per=True):
         """
         Arguments:
             size: Integer, Number of stored transitions
@@ -24,7 +24,7 @@ class ReplayBuffer:
         self.rewards = np.empty(self.size, dtype=np.float32)
         self.frames = np.empty((self.size, self.input_shape[0], self.input_shape[1]), dtype=np.uint8)
         self.alt_frames = np.empty((self.size, self.input_shape[0], self.input_shape[1]), dtype=np.uint8)
-        self.features = np.empty((self.size, FEATURE_NUM), dtype=np.float32)
+        self.features = np.empty((self.size, feature_num), dtype=np.float32)
         self.terminal_flags = np.empty(self.size, dtype=np.bool)
         self.priorities = np.zeros(self.size, dtype=np.float32)
 
