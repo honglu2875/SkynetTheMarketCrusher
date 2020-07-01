@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 class ReplayBuffer:
 
@@ -35,8 +36,8 @@ class ReplayBuffer:
         Arguments:
             action: An integer between 0 and env.action_space.n - 1
                 determining the action the agent perfomed
-            frame: A (84, 84, 1) frame of the game in grayscale
-            alt_frame: A (84, 84, 1) frame of the game in grayscale
+            frame: A (84, 84) frame of the game in grayscale
+            alt_frame: A (84, 84) frame of the game in grayscale
             features: A list of features
             reward: A float determining the reward the agent received for performing an action
             terminal: A bool stating whether the episode terminated
