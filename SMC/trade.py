@@ -31,7 +31,7 @@ class TradeEnv:
         self.ALLOW_FLIP = ALLOW_FLIP
 
         self.USE_ALT_TIMEFRAME = USE_ALT_TIMEFRAME
-        if self.USE_ALT_TIMEFRAME and (alt_input_df == None or index_mapping == None):
+        if self.USE_ALT_TIMEFRAME and (alt_input_df is None or index_mapping is None):
             raise ValueError('Require alt_input_df and index_mapping.')
         self.alt_data = alt_input_df
         self.index_mapping = index_mapping
@@ -80,7 +80,7 @@ class TradeEnv:
         self.current_target = 0
         self.terminal = False
 
-        if selected_date == None:
+        if selected_date is None:
             self.current_date_index = random.randrange(0, len(self.dates))
             self.current_date = self.dates[self.current_date_index]
         else:
@@ -97,7 +97,7 @@ class TradeEnv:
         self.current_range = self.get_data(self.current_date)
 
         count = 1
-        while selected_date == None and self.current_range[1] - self.current_range[0] + 1 < self.MIN_FRAME:
+        while selected_date is None and self.current_range[1] - self.current_range[0] + 1 < self.MIN_FRAME:
             self.current_date = self.dates[random.randrange(0, len(self.dates))]
             self.current_range = self.get_data(self.current_date)
             ###### A warning for potential infinite loop
