@@ -23,18 +23,20 @@ class ReplayBuffer:
         self.actions = np.empty(self.size, dtype=np.int32)
         self.rewards = np.empty(self.size, dtype=np.float32)
         self.frames = np.empty((self.size, self.input_shape[0], self.input_shape[1]), dtype=np.uint8)
+        self.alt_frames = np.empty((self.size, self.input_shape[0], self.input_shape[1]), dtype=np.uint8)
         self.features = np.empty((self.size, FEATURE_NUM), dtype=np.float32)
         self.terminal_flags = np.empty(self.size, dtype=np.bool)
         self.priorities = np.zeros(self.size, dtype=np.float32)
 
         self.use_per = use_per
 
-    def add_experience(self, action, frame, features, reward, terminal, clip_reward=False):
+    def add_experience(self, action, frame, alt_frame, features, reward, terminal, clip_reward=False):
         """Saves a transition to the replay buffer
         Arguments:
             action: An integer between 0 and env.action_space.n - 1
                 determining the action the agent perfomed
             frame: A (84, 84, 1) frame of the game in grayscale
+            alt_frame: A (84, 84, 1) frame of the game in grayscale
             features: A list of features
             reward: A float determining the reward the agent received for performing an action
             terminal: A bool stating whether the episode terminated
@@ -48,6 +50,7 @@ class ReplayBuffer:
         # Write memory
         self.actions[self.current] = action
         self.frames[self.current, ...] = frame
+        self.alt_frame[self.current, ...] = alt_frame
         self.features[self.current] = features
         self.rewards[self.current] = reward
         self.terminal_flags[self.current] = terminal
@@ -98,18 +101,29 @@ class ReplayBuffer:
         new_frames = []
         features = []
         new_features = []
+        alt_frames = []
+        new_alt_frames = []
+        
         for idx in indices:
             fr = self.frames[idx-self.history_length:idx, ...]
-            new_fr = self.frames[idx-self.history_length+1:idx+1, ...]
+            new_fr = self.frames[idx-self.history_length + 1:idx + 1, ...]
             fr = np.transpose(np.asarray(fr), axes=(1, 2, 0))
             new_fr = np.transpose(np.asarray(new_fr), axes=(1, 2, 0))
+            
+            alt_fr = self.alt_frame[idx - 1, ...]
+            new_alt_fr = self.alt_frame[idx, ...]
 
             frames.append(fr) #Note that these are previous frames of the action
             features.append(np.array(self.features[idx - 1]))
+            alt_frames.append(alt_fr)
+            
             new_frames.append(new_fr)
             new_features.append(np.array(self.features[idx]))
-        states = [np.asarray(frames), np.asarray(features)]
-        new_states = [np.asarray(new_frames), np.asarray(new_features)]
+            new_alt_frames.append(new_alt_fr)
+        
+        
+        states = [np.asarray(frames), np.asarray(alt_frames), np.asarray(features)]
+        new_states = [np.asarray(new_frames), np.asarray(new_alt_frames), np.asarray(new_features)]
 
         if self.use_per:
             # Get importance weights from probabilities calculated earlier
@@ -137,6 +151,7 @@ class ReplayBuffer:
 
         np.save(folder_name + '/actions.npy', self.actions)
         np.save(folder_name + '/frames.npy', self.frames)
+        np.save(folder_name + '/alt_frames.npy', self.alt_frames)
         np.save(folder_name + '/features.npy', self.features)
         np.save(folder_name + '/rewards.npy', self.rewards)
         np.save(folder_name + '/terminal_flags.npy', self.terminal_flags)
@@ -145,6 +160,7 @@ class ReplayBuffer:
         """Loads the replay buffer from a folder"""
         self.actions = np.load(folder_name + '/actions.npy')
         self.frames = np.load(folder_name + '/frames.npy')
+        self.alt_frames = np.load(folder_name + '/alt_frames.npy')
         self.features = np.load(folder_name + '/features.npy')
         self.rewards = np.load(folder_name + '/rewards.npy')
         self.terminal_flags = np.load(folder_name + '/terminal_flags.npy')
