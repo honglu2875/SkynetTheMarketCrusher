@@ -133,7 +133,7 @@ class TradeEnv:
                     print(f'{self.current_date}: Currently has a short position. Flipping is not allowed.')
                 return
 
-        self.current_entry = self.data.loc[self.current_range[0] + self.current_step, 'last']
+        self.current_entry = self.data.loc[self.current_range[0] + self.current_step + 1, 'open'] #Enter at the open of the next candle
         self.current_position = self.current_position - 1
         self.realized_PL -= self.COMMISSION
         
@@ -161,7 +161,7 @@ class TradeEnv:
                     print(f'{self.current_date}: Currently has a short position. Flipping is not allowed.')
                 return
 
-        self.current_entry = self.data.loc[self.current_range[0] + self.current_step, 'last']
+        self.current_entry = self.data.loc[self.current_range[0] + self.current_step + 1, 'open'] #Enter at the open of the next candle
         self.current_position = self.current_position + 1
         self.realized_PL -= self.COMMISSION
 
