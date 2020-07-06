@@ -54,7 +54,8 @@ class TradeEnv:
 
         self.MIN_FRAME = 10
 
-
+    def reward_function(self): #override the reward function to try other approaches
+        return self.realized_PL + self.current_position * (last - self.current_entry) - self.PL
 
     def get_data(self, selected_date):
 
@@ -248,7 +249,7 @@ class TradeEnv:
 
 
         last = self.data.loc[self.current_range[0] + self.current_step, 'last']
-        reward = self.realized_PL + self.current_position * (last - self.current_entry) - self.PL
+        reward = self.reward_function()
         self.PL = self.realized_PL + self.current_position * (last - self.current_entry)
 
         ###### If the maximal daily drawdown is hit or it is at the last entry of the trading day, liquidate and mark the self.terminal to be True
