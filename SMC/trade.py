@@ -20,6 +20,7 @@ class TradeEnv:
         self.frame_length = frame_length
         self.PL = 0
         self.realized_PL = 0
+        self.last = 0
         self.frame = None # numpy.array of size self.frame_length * self.frame_length * 1
         self.alt_frame = None # numpy.array of size self.frame_length * self.frame_length * 1
         self.stop = stop
@@ -55,7 +56,7 @@ class TradeEnv:
         self.MIN_FRAME = 10
 
     def reward_function(self): #override the reward function to try other approaches
-        return self.realized_PL + self.current_position * (last - self.current_entry) - self.PL
+        return self.realized_PL + self.current_position * (self.last - self.current_entry) - self.PL
 
     def get_data(self, selected_date):
 
@@ -114,6 +115,8 @@ class TradeEnv:
         if self.USE_ALT_TIMEFRAME:
             self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0]], self.alt_data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE * self.SCALE_FACTOR)
 
+        self.last = self.data.loc[self.current_range[0], 'last']
+        
         return self.frame, self.alt_frame, self.data.loc[self.current_range[0], self.FEATURE_LIST].to_list() + [self.current_position, self.PL, self.realized_PL]
 
 
@@ -188,7 +191,7 @@ class TradeEnv:
                 assert self.current_position != 0
                 self.realized_PL = self.realized_PL + self.current_position * self.stop * self.TICK_SIZE
             else:
-                self.realized_PL = self.realized_PL + self.current_position * (self.data.loc[self.current_range[0] + self.current_step, 'last'] - self.current_entry)
+                self.realized_PL = self.realized_PL + self.current_position * (self.last - self.current_entry)
             self.realized_PL -= self.COMMISSION
 
         self.current_position = 0
@@ -248,9 +251,9 @@ class TradeEnv:
                     self.flatten(stop_hit=True)
 
 
-        last = self.data.loc[self.current_range[0] + self.current_step, 'last']
+        self.last = self.data.loc[self.current_range[0] + self.current_step, 'last']
         reward = self.reward_function()
-        self.PL = self.realized_PL + self.current_position * (last - self.current_entry)
+        self.PL = self.realized_PL + self.current_position * (self.last - self.current_entry)
 
         ###### If the maximal daily drawdown is hit or it is at the last entry of the trading day, liquidate and mark the self.terminal to be True
         if self.current_step == self.current_range[1] - self.current_range[0] or self.PL <= - self.MAX_DAILY_STOP * self.TICK_SIZE:
