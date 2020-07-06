@@ -275,13 +275,13 @@ class TradeWrapper:
                  TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST='', ALLOW_FLIP=True,
                  SCALE_IN=False, MAX_CONTRACT=1,
                  USE_ALT_TIMEFRAME=True, alt_input_df=None, index_mapping=None,
-                 COMMISSION=0):
+                 COMMISSION=0, env=TradeEnv):
 
-        self.env = TradeEnv(input_df, dates, date_index, frame_length,
-                            stop=stop, target=target, TICK_SIZE=TICK_SIZE, SCALE_FACTOR=SCALE_FACTOR, MAX_DAILY_STOP=MAX_DAILY_STOP, OUTPUT_LOG=OUTPUT_LOG,
-                            FEATURE_LIST=FEATURE_LIST, ALLOW_FLIP=ALLOW_FLIP, SCALE_IN=SCALE_IN, MAX_CONTRACT=MAX_CONTRACT,
-                            USE_ALT_TIMEFRAME=USE_ALT_TIMEFRAME, alt_input_df=alt_input_df, index_mapping=index_mapping,
-                            COMMISSION=COMMISSION)
+        self.env = env(input_df, dates, date_index, frame_length,
+                       stop=stop, target=target, TICK_SIZE=TICK_SIZE, SCALE_FACTOR=SCALE_FACTOR, MAX_DAILY_STOP=MAX_DAILY_STOP, OUTPUT_LOG=OUTPUT_LOG,
+                       FEATURE_LIST=FEATURE_LIST, ALLOW_FLIP=ALLOW_FLIP, SCALE_IN=SCALE_IN, MAX_CONTRACT=MAX_CONTRACT,
+                       USE_ALT_TIMEFRAME=USE_ALT_TIMEFRAME, alt_input_df=alt_input_df, index_mapping=index_mapping,
+                       COMMISSION=COMMISSION)
 
         self.frame = None
         self.alt_frame = None
