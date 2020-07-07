@@ -282,7 +282,8 @@ class TradeEnv:
                 reward,
                 self.terminal)
 
-
+    def get_PL(self):
+        return self.PL
 
     def get_date(self):
         return self.current_date
@@ -363,7 +364,8 @@ class TradeWrapper:
         """
         return self.state
 
-
+    def get_PL(self):
+        return self.env.get_PL()
 
     def get_date(self):
         """Returns the current date of the underlying TradeEnv object
