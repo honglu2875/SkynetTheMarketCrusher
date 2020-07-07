@@ -21,6 +21,11 @@ class TradeEnv:
         self.PL = 0
         self.realized_PL = 0
         self.last = 0
+        
+        ###### Recording the number of trades and flags whether it entered a new trade (closing is ignored). Mainly used for the design of the reward function.
+        self.num_of_trade = 0
+        self.entering_trade = False
+        
         self.frame = None # numpy.array of size self.frame_length * self.frame_length * 1
         self.alt_frame = None # numpy.array of size self.frame_length * self.frame_length * 1
         self.stop = stop
@@ -55,7 +60,7 @@ class TradeEnv:
 
         self.MIN_FRAME = 10
 
-    def reward_function(self): #override the reward function to try other approaches
+    def reward_function(self): # override the reward function to try other approaches
         return self.realized_PL + self.current_position * (self.last - self.current_entry) - self.PL
 
     def get_data(self, selected_date):
@@ -85,7 +90,10 @@ class TradeEnv:
         self.current_entry = 0
         self.current_stop = 0
         self.current_target = 0
+        
         self.terminal = False
+        self.num_of_trade = 0
+        self.entering_trade = False
 
         if selected_date is None:
             self.current_date_index = random.randrange(0, len(self.dates))
@@ -103,6 +111,7 @@ class TradeEnv:
                 raise TypeError('Unsupported type for the date.')
         self.current_range = self.get_data(self.current_date)
 
+        ###### Select a random date with enough frames
         count = 1
         while selected_date is None and self.current_range[1] - self.current_range[0] + 1 < self.MIN_FRAME:
             self.current_date = self.dates[random.randrange(0, len(self.dates))]
@@ -111,6 +120,7 @@ class TradeEnv:
             if count % 10000 == 0: warnings.warn(f'Potentially unable to find a date with more than {self.MIN_FRAME} frames.')
             count += 1
 
+        ###### Set the initial frame and alternative timeframe
         self.frame = trade_to_cropped_pic(self.current_range[0], self.current_range[0], self.data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE * self.SCALE_FACTOR)
         if self.USE_ALT_TIMEFRAME:
             self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0]], self.alt_data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE * self.SCALE_FACTOR)
@@ -140,6 +150,8 @@ class TradeEnv:
         self.current_entry = self.data.loc[self.current_range[0] + self.current_step + 1, 'open'] #Enter at the open of the next candle
         self.current_position = self.current_position - 1
         self.realized_PL -= self.COMMISSION
+        self.num_of_trade += 1
+        self.entering_trade = True
         
         ###### Only set stop or target when 1. there is a stop/target given, and 2. this is a new entry, not a repeated scale-in
         if self.stop != None and self.current_position == -1:
@@ -168,6 +180,8 @@ class TradeEnv:
         self.current_entry = self.data.loc[self.current_range[0] + self.current_step + 1, 'open'] #Enter at the open of the next candle
         self.current_position = self.current_position + 1
         self.realized_PL -= self.COMMISSION
+        self.num_of_trade += 1
+        self.entering_trade = True
 
         ###### Only set stop or target when 1. there is a stop/target given, and 2. this is a new entry, not a repeated scale-in
         if self.stop != None and self.current_position == 1:
