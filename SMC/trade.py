@@ -231,6 +231,8 @@ class TradeEnv:
               terminal: a boolean recording whether the game is over (at max drawdown or at market close)
         """
 
+        self.entering_trade = False
+        
         if not self.terminal:
             if action == 0:
                 pass
