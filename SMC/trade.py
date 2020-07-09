@@ -2,30 +2,30 @@ import random
 import warnings
 from datetime import datetime, date
 from .chart import trade_to_cropped_pic
+from .datareader import datepreprocess
 import numpy as np
 import pandas as pd
 
 class TradeEnv:
 
-    def __init__(self, input_df, dates, date_index, frame_length, stop=None, target=None,
+    def __init__(self, input_df, frame_length, stop=None, target=None,
                  TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST='', ALLOW_FLIP=True,
                  SCALE_IN=False, MAX_CONTRACT=1, # MAX_CONTRACT will only be checked when SCALE_IN=True
-                 USE_ALT_TIMEFRAME=True, alt_input_df=None, index_mapping=None, # When ALT_TIMEFRAME is turned on, we include a snapshot of an alternative timeframe in the output
+                 USE_ALT_TIMEFRAME=True, alt_input_df=None, # When ALT_TIMEFRAME is turned on, we include a snapshot of an alternative timeframe in the output
                  COMMISSION=.1): #Commission is in ticks
 
         self.data = input_df # pandas.DataFrame
-        self.dates = dates # list of datetime objects
-        self.date_index = date_index # list of int
+        self.alt_data = alt_input_df
 
         self.frame_length = frame_length
         self.PL = 0
         self.realized_PL = 0
         self.last = 0
-        
+
         ###### Recording the number of trades and flags whether it entered a new trade (closing is ignored). Mainly used for the design of the reward function.
         self.num_of_trade = 0
         self.entering_trade = False
-        
+
         self.frame = None # numpy.array of size self.frame_length * self.frame_length * 1
         self.alt_frame = None # numpy.array of size self.frame_length * self.frame_length * 1
         self.stop = stop
@@ -42,10 +42,12 @@ class TradeEnv:
         self.COMMISSION = COMMISSION
 
         self.USE_ALT_TIMEFRAME = USE_ALT_TIMEFRAME
-        if self.USE_ALT_TIMEFRAME and (alt_input_df is None or index_mapping is None):
-            raise ValueError('Require alt_input_df and index_mapping.')
-        self.alt_data = alt_input_df
-        self.index_mapping = index_mapping
+        if self.USE_ALT_TIMEFRAME:
+            if self.alt_data is None:
+                raise ValueError('Require alt_input_df.')
+            self.dates, self.date_index, self.index_mapping = datepreprocess(self.data, self.alt_data)
+        else:
+            self.dates, self.date_index, _ = datepreprocess(self.data, self.data)
 
         self.current_date = None # date object
         self.current_date_index = None # an integer indicating the position of current_date in dates
@@ -59,6 +61,8 @@ class TradeEnv:
         self.terminal = True
 
         self.MIN_FRAME = 10
+
+
 
     def reward_function(self): # override the reward function to try other approaches
         return self.realized_PL + self.current_position * (self.last - self.current_entry) - self.PL
@@ -90,7 +94,7 @@ class TradeEnv:
         self.current_entry = 0
         self.current_stop = 0
         self.current_target = 0
-        
+
         self.terminal = False
         self.num_of_trade = 0
         self.entering_trade = False
@@ -126,7 +130,7 @@ class TradeEnv:
             self.alt_frame = trade_to_cropped_pic(0, self.index_mapping[self.current_range[0]], self.alt_data, pic_size=self.frame_length, TICK_SIZE=self.TICK_SIZE * self.SCALE_FACTOR)
 
         self.last = self.data.loc[self.current_range[0], 'last']
-        
+
         return self.frame, self.alt_frame, self.data.loc[self.current_range[0], self.FEATURE_LIST].to_list() + [self.current_position, self.PL, self.realized_PL]
 
 
@@ -152,7 +156,7 @@ class TradeEnv:
         self.realized_PL -= self.COMMISSION
         self.num_of_trade += 1
         self.entering_trade = True
-        
+
         ###### Only set stop or target when 1. there is a stop/target given, and 2. this is a new entry, not a repeated scale-in
         if self.stop != None and self.current_position == -1:
             self.current_stop = self.current_entry + self.stop * self.TICK_SIZE
@@ -232,7 +236,7 @@ class TradeEnv:
         """
 
         self.entering_trade = False
-        
+
         if not self.terminal:
             if action == 0:
                 pass
@@ -291,16 +295,16 @@ class TradeEnv:
 
 class TradeWrapper:
 
-    def __init__(self, input_df, dates, date_index, no_op_steps, frame_length=84, history_length=4, stop=None, target=None,
+    def __init__(self, input_df, no_op_steps, frame_length=84, history_length=4, stop=None, target=None,
                  TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST='', ALLOW_FLIP=True,
                  SCALE_IN=False, MAX_CONTRACT=1,
-                 USE_ALT_TIMEFRAME=True, alt_input_df=None, index_mapping=None,
+                 USE_ALT_TIMEFRAME=True, alt_input_df=None,
                  COMMISSION=0, env=TradeEnv):
 
-        self.env = env(input_df, dates, date_index, frame_length,
+        self.env = env(input_df, frame_length,
                        stop=stop, target=target, TICK_SIZE=TICK_SIZE, SCALE_FACTOR=SCALE_FACTOR, MAX_DAILY_STOP=MAX_DAILY_STOP, OUTPUT_LOG=OUTPUT_LOG,
                        FEATURE_LIST=FEATURE_LIST, ALLOW_FLIP=ALLOW_FLIP, SCALE_IN=SCALE_IN, MAX_CONTRACT=MAX_CONTRACT,
-                       USE_ALT_TIMEFRAME=USE_ALT_TIMEFRAME, alt_input_df=alt_input_df, index_mapping=index_mapping,
+                       USE_ALT_TIMEFRAME=USE_ALT_TIMEFRAME, alt_input_df=alt_input_df,
                        COMMISSION=COMMISSION)
 
         self.frame = None
