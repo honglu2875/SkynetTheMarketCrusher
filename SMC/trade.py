@@ -45,9 +45,9 @@ class TradeEnv:
         if self.USE_ALT_TIMEFRAME:
             if self.alt_data is None:
                 raise ValueError('Require alt_input_df.')
-            self.dates, self.date_index, self.index_mapping = datepreprocess(self.data, self.alt_data)
+            self.dates, self.date_index, self.index_mapping = datepreprocess(self.data['datetime'].to_list(), self.alt_data['datetime'].to_list())
         else:
-            self.dates, self.date_index, _ = datepreprocess(self.data, self.data)
+            self.dates, self.date_index, _ = datepreprocess(self.data['datetime'].to_list(), self.data['datetime'].to_list())
 
         self.current_date = None # date object
         self.current_date_index = None # an integer indicating the position of current_date in dates
