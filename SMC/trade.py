@@ -9,7 +9,7 @@ import pandas as pd
 class TradeEnv:
 
     def __init__(self, input_df, frame_length, stop=None, target=None,
-                 TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST='', ALLOW_FLIP=True,
+                 TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST=[], ALLOW_FLIP=True,
                  SCALE_IN=False, MAX_CONTRACT=1, # MAX_CONTRACT will only be checked when SCALE_IN=True
                  USE_ALT_TIMEFRAME=True, alt_input_df=None, # When ALT_TIMEFRAME is turned on, we include a snapshot of an alternative timeframe in the output
                  COMMISSION=.1): #Commission is in ticks
@@ -27,7 +27,7 @@ class TradeEnv:
         self.entering_trade = False
 
         self.frame = None # numpy.array of size self.frame_length * self.frame_length * 1
-        self.alt_frame = None # numpy.array of size self.frame_length * self.frame_length * 1
+        self.alt_frame = np.zeros((self.frame_length, self.frame_length, 1)) # numpy.array of size self.frame_length * self.frame_length * 1
         self.stop = stop
         self.target = target
 
@@ -296,7 +296,7 @@ class TradeEnv:
 class TradeWrapper:
 
     def __init__(self, input_df, no_op_steps, frame_length=84, history_length=4, stop=None, target=None,
-                 TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST='', ALLOW_FLIP=True,
+                 TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST=[], ALLOW_FLIP=True,
                  SCALE_IN=False, MAX_CONTRACT=1,
                  USE_ALT_TIMEFRAME=True, alt_input_df=None,
                  COMMISSION=0, env=TradeEnv):
