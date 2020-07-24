@@ -4,6 +4,7 @@ from dm_env import specs
 from .trade import TradeEnv
 import numpy as np
 import pandas as pd
+import random
 
 
 
@@ -16,7 +17,7 @@ class trade_environment(base.Environment):
             COMMISSION=0, env=TradeEnv
     '''
     def __init__(self, input_df, frame_length=84, history_length=4, stop=None, target=None,
-              TICK_SIZE=.25, SCALE_FACTOR=1, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST=[], ALLOW_FLIP=True,
+              TICK_SIZE=.25, SCALE_MIN=.25, SCALE_MAX=4, MAX_DAILY_STOP=10, OUTPUT_LOG=False, FEATURE_LIST=[], ALLOW_FLIP=True,
               SCALE_IN=False, MAX_CONTRACT=1,
               USE_ALT_TIMEFRAME=False, alt_input_df=None,
               COMMISSION=0, env=TradeEnv):
@@ -24,7 +25,7 @@ class trade_environment(base.Environment):
         super().__init__()
 
         self._env = env(input_df, frame_length,
-                    stop=stop, target=target, TICK_SIZE=TICK_SIZE, SCALE_FACTOR=SCALE_FACTOR, MAX_DAILY_STOP=MAX_DAILY_STOP, OUTPUT_LOG=OUTPUT_LOG,
+                    stop=stop, target=target, TICK_SIZE=TICK_SIZE, MAX_DAILY_STOP=MAX_DAILY_STOP, OUTPUT_LOG=OUTPUT_LOG,
                     FEATURE_LIST=FEATURE_LIST, ALLOW_FLIP=ALLOW_FLIP, SCALE_IN=SCALE_IN, MAX_CONTRACT=MAX_CONTRACT,
                     USE_ALT_TIMEFRAME=USE_ALT_TIMEFRAME, alt_input_df=alt_input_df,
                     COMMISSION=COMMISSION)
@@ -41,12 +42,15 @@ class trade_environment(base.Environment):
 
         self._USE_ALT_TIMEFRAME = USE_ALT_TIMEFRAME
 
+        self._SCALE_MIN = SCALE_MIN
+        self._SCALE_MAX = SCALE_MAX
+
         self._reset()
 
 
     def _reset(self):
 
-        self._frame, self._alt_frame, _features = self._env.reset()
+        self._frame, self._alt_frame, _features = self._env.reset(scale=random.uniform(self._SCALE_MIN, self._SCALE_MAX))
 
         # For the initial state, we stack the first frame four times
         self._state = [np.repeat(self._frame, self._history_length, axis=2).astype('uint8'),
