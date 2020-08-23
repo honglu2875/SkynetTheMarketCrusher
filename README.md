@@ -1,2 +1,2 @@
 # SkynetTheMarketCrusher
-We attempt to crush the future market with DQN type unsupervised learning technique.
+We attempt to simulate trader behaviors on the future market with DQN type unsupervised learning technique.
