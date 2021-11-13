@@ -346,15 +346,11 @@ class TradeWrapper:
         """Performs an action and observes the result
         Arguments:
             action: An integer describe action the agent chose
-            render_mode: None doesn't render anything, 'human' renders the screen in a new window, 'rgb_array' returns an np.array with rgb values
         Returns:
             new_frame: The processed new frame as a result of that action
             alt_frame: The alternative timeframe that one can observe after that action
             reward: The reward for taking that action
             terminal: Whether the game has ended
-            life_lost: Whether a life has been lost
-            new_frame: The raw new frame as a result of that action
-            If render_mode is set to 'rgb_array' this also returns the rendered rgb_array
         """
         self._frame, self._alt_frame, features, reward, terminal = self._env.step(action)
 

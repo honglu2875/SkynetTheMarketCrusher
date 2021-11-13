@@ -48,9 +48,9 @@ class trade_environment(base.Environment):
         self._reset()
 
 
-    def _reset(self):
+    def _reset(self, selected_date=None):
 
-        self._frame, self._alt_frame, _features = self._env.reset(scale=random.uniform(self._SCALE_MIN, self._SCALE_MAX))
+        self._frame, self._alt_frame, _features = self._env.reset(selected_date=selected_date, scale=random.uniform(self._SCALE_MIN, self._SCALE_MAX))
 
         # For the initial state, we stack the first frame four times
         self._state = [np.repeat(self._frame, self._history_length, axis=2).astype('uint8'),
