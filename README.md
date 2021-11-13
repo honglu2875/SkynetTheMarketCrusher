@@ -1,5 +1,7 @@
 # SkynetTheMarketCrusher
-An attempt to train trader behaviors on a bot in the future market with DQN type unsupervised learning technique. The purpose of this repo is to transform SierraChart data dump (a .csv file that records future data, E-mini S&P future by default) into a game-like environment that fits DeepMind's bsuite. The documentation here is very simplistic because I do not know who else could be interested. But in case there is any, please contact me and I will make it more user-friendly.
+A library for nurturing trader behaviors on a neural network in the future market with DQN type reinforcement learning technique.
+
+The purpose of this repo is to transform SierraChart data dump (a .csv file that records future data, E-mini S&P future by default) into a game-like environment that fits DeepMind's bsuite. The documentation here is very simplistic because I do not know who else could be interested. But in case there is any, please contact me and I will make it more user-friendly.
 
 (Note: The training of DQN agent uses this library but is not saved inside this repo.)
 
