@@ -27,3 +27,16 @@ Once the step method is invoked, an action will be taken, the next candlestick w
 ## In environment.py
 ### trade_environment: 
 #### Further wrap around TradeEnv to fit DeepMind's bsuite
+
+
+
+Why the result in 2020 was not splendid and what improvement is planned:
+---
+When I first get to know about neural network and reinforcement learning in 2020, it was a mysterious black box that was able to make everything work. This was part of the reasons why I constructed this library to pass trading data through this magical black box and see if miracle happens. Now that the charm has faded off, I'm able to look at it with a pair of cold eyes and rethink what did not work and what should be improved:
+
+Neural network is one of many ways to construct a function that takes an input and emits an output, and it is flexible enough to be modified (by gradient method for example) to let the output be as close to ground truth as possible on a fixed amount of "training" data. In the kind of mathematical language that I'm used to, I'd say that neural network forms a moduli space isomorphic to R^n inside the space of continuous functions. There is no mystery around that as they are essentially a bunch of complicated piecewise-linear functions (as long as we only use the traditional layers including Dense, Convolution, etc.), and whatever we are doing is a form of linear regression.
+
+DQN has a beautiful-looking backward recursion formula and some fancy experiments started with Atari by Google DeepMind. But imagine the whole game as a game tree/graph (state:vertices, action:edges) with a "Q-value" attached to each vertex satistying the recursion. What DQN does is nothing but starting with a random assignment and update through edges one-by-one to get as close to this "Q-value" as possible. If the memory (replay buffer) is organized by random play, it's simply a fancy mix of ideas from Depth-first Search (random play into one branch at a time) and Monte-Carlo Search (choose most frequently the best action).
+
+...(to be cont)
+
