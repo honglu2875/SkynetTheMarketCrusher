@@ -4,9 +4,9 @@ A library for nurturing trader behaviors on a neural network in the future marke
 (update note: This was heavily worked on more than a year ago in 2020 but most of the work was kept private. The README is now cleaned up and updated on Nov 13 2021 because of a renewed interest to revive the hobby project. It's been a year and a lot have changed. As of now, the code is not tested against all the changes of libraries including DeepMind's bsuite, acme, dm_env, etc.)
 
 
-The purpose of this repo is to transform SierraChart data dump (a .csv file that records future data, E-mini S&P future by default) into a game-like environment that fits DeepMind's bsuite. The documentation here is very simplistic because I do not know who else could be interested. But in case there is any, please contact me and I will make it more user-friendly.
+The purpose of this repo is to transform SierraChart data dump (a .csv file that records future data, E-mini S&P future by default) into a game-like environment that fits DeepMind's bsuite.
 
-(Note: The training of DQN agent uses this library but is not saved inside this repo.)
+(Note: The notebook for training the DQN agents uses this library but is not saved inside this repo.)
 
 The most important files are trade.py and environment.py.
 
