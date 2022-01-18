@@ -15,13 +15,13 @@ The core class. Simulate a game-like environment. It will
 - show an intraday historical chart and optionally attach an alternate timeframe (USE_ALT_TIMEFRAME),
 - and trade. 
 
-During trading, an agent can take the following actions (TradeEnv.step(action))
+During trading, an agent can take the following actions
 - action=0: do nothing
 - action=1: long
 - action=2: short
 - action=3: flatten
 
-Once ```TradeEnv.step()``` method is invoked, an action will be taken, the next candlestick will be loaded and the chart will be updated.
+Once ```TradeEnv.step(action)``` method is invoked, the corresponding action will be taken. The next candlestick will be loaded and the chart will be updated.
 
 **TradeWrapper:**
 Wrap around TradeEnv to make it more suitable for DQN training.
