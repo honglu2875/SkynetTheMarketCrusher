@@ -10,14 +10,18 @@ The most important files are trade.py and environment.py.
 ## In trade.py
 
 **TradeEnv:**
-The core class. Simulate a game-like environment. It will fix a random date with more than 10 candlestick bars, show an intraday historical chart and possibly attach an alternate timeframe (USE_ALT_TIMEFRAME) and trade. 
+The core class. Simulate a game-like environment. It will 
+- fix a random date with more than 10 candlestick bars, 
+- show an intraday historical chart and optionally attach an alternate timeframe (USE_ALT_TIMEFRAME),
+- and trade. 
 
 During trading, an agent can take the following actions (TradeEnv.step(action))
-action=0: do nothing
-action=1: long
-action=2: short
-action=3: flatten
-Once the step method is invoked, an action will be taken, the next candlestick will be loaded and the chart will be updated.
+- action=0: do nothing
+- action=1: long
+- action=2: short
+- action=3: flatten
+
+Once ```TradeEnv.step()``` method is invoked, an action will be taken, the next candlestick will be loaded and the chart will be updated.
 
 **TradeWrapper:**
 Wrap around TradeEnv to make it more suitable for DQN training.
@@ -36,7 +40,7 @@ Neural network is one of many ways to construct a function that takes an input a
 
 DQN has a beautiful-looking backward recursion formula and some fancy experiments started with Atari by Google DeepMind. But imagine the whole game as a game tree/graph (state:vertices, action:edges) with a "Q-value" attached to each vertex satistying the recursion. What DQN does is nothing but starting with a random assignment of the Q-value and update through edges one-by-one to get as close to the ground true "Q-value" as possible (where convergence needs a proof). If the memory (replay buffer) is organized by random play, it's simply a fancy mix of ideas from Depth-first Search (random play into one branch at a time) and Monte-Carlo Search (most of the time choose the best action to become a memory).
 
-The biggest problems with a trading environment are two-fold:
+The biggest problems with a trading environment are three-fold:
 1. It's not deterministic => the future reward is not determined by the past and the action (we are not market makers, sadly). In other words, there might be hidden high probability strategies, but the amount of noise is immense.
 2. The data is VERY limited. Despite having randomized intraday play, picture inputs (charts) are limited to what's available in the data. Overfitting on the repeatedly occuring chart is a massive concern (and I did end up overfitting in almost all my experiments)
 3. Generalizability of chart knowledge. If the neural network recognizes a pattern, does it still recognize if after translation and scaling? This is basically the robustness issue of the neural network and it needs a lot of engineering.
