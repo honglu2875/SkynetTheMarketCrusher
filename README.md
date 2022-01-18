@@ -1,5 +1,5 @@
 # SkynetTheMarketCrusher
-A library to (hopefully) train trader behaviors on a neural network in the future market with DQN type reinforcement learning technique (training code not included).
+A library used in a hobby study to train trader behaviors on a neural network in the future market with DQN type reinforcement learning technique (training code not included).
 
 (update note: This was heavily worked on more than a year ago in 2020 but most of the work was kept private. The README is now cleaned up and updated on Nov 13 2021 because of a renewed interest to revive the hobby project. It's been a year and a lot have changed. As of now, the code is not tested against the new versions of libraries including DeepMind's bsuite, acme, dm_env, etc.)
 
